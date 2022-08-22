@@ -6,7 +6,7 @@ My Code Backup Repository
 
 > ResNet50 모델 복구 : [(완료)](./ResNet50.py)
 
-> Keras-Tuner 코드 복구 : [(완료]](./HyperResNet_Training.py)
+> Keras-Tuner 코드 복구 : [(완료)](./HyperResNet_Training.py)
 
 > ResNet50 HP Tuning : 진행중
 >> Learning_rate : ???
