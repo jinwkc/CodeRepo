@@ -14,8 +14,9 @@ strategy=MirroredStrategy(devices=["GPU:0", "GPU:1"],cross_device_ops=NcclAllRed
 data_path='/home/jovyan/data/classification/'
 
 def load_data(data_dir_path,img_size=64,batch_size=64):
-    datagen = ImageDataGenerator(rescale = 1./255,horizontal_flip=True,vertical_flip=True)
-                                   # shear_range = 0.2, zoom_range = 0.2, horizontal_flip = True, validation_split=0.2)
+    datagen = ImageDataGenerator(rescale = 1./255)
+                                   # ,horizontal_flip=True,vertical_flip=True, 
+        #shear_range = 0.2, zoom_range = 0.2, horizontal_flip = True, validation_split=0.2)
     training_set = datagen.flow_from_directory(data_dir_path+'train/', target_size = (img_size, img_size),
                                                  batch_size = batch_size, class_mode = 'categorical')
     valid_set=datagen.flow_from_directory(data_dir_path+'valid/', target_size = (img_size, img_size),
