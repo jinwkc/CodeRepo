@@ -13,3 +13,9 @@ My Code Backup Repository
 
 > Random Accuracy Code : 복구예정
 >> Random Accuracy Test : ??%
+
+> ViT Code 복구 : 진행예정
+
+> DeiT Code 복구 : 진행예정
+
+> Federated Learning 실험 : 진행예정
