@@ -28,7 +28,8 @@ if __name__== "__main__":
     
     print(args.input_size, args.batch_size, args.lr)
     
-    strategy=MirroredStrategy(devices=["GPU:0", "GPU:1"],cross_device_ops=NcclAllReduce(num_packs=2))
+    # strategy=MirroredStrategy(devices=["GPU:0", "GPU:1"],cross_device_ops=NcclAllReduce(num_packs=2))
+    strategy=MirroredStrategy(devices=["GPU:0", "GPU:1","GPU:2","GPU:3"],cross_device_ops=NcclAllReduce(num_packs=2))
     
     # data_path='/home/jovyan/data/imagenet/'
     tr_set,valid_set,test_set=load_data(data_dir_path=args.data_path,img_size=args.input_size,batch_size=args.batch_size)
