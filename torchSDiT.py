@@ -165,7 +165,14 @@ class SDiT_Base(nn.Module):
         self.pos_embed = nn.Parameter(torch.zeros(1, 1 + self.patch_embed.n_patches, embed_dim))
         self.pos_drop = nn.Dropout(p=p)
         
-        self.block1 = Encoder(
+        # [수정] depth 인자가 무시되던 문제 수정
+        # - 기존: block1~block12, aux_mlp1~aux_mlp11을 개별 속성으로 하드코딩 → depth와 무관하게 항상 12층
+        # - 변경: nn.ModuleList로 depth개의 Encoder 블록과 (depth - 1)개의 보조 분류기(Aux_MLP)를 생성
+        # - depth=12(기본값)에서는 구조/파라미터 수가 기존과 동일하나,
+        #   state_dict 키 이름이 block1 -> blocks.0, aux_mlp1 -> aux_mlps.0 형태로 바뀜
+        self.blocks = nn.ModuleList(
+            [
+                Encoder(
                     dim=embed_dim,
                     n_heads=n_heads,
                     mlp_ratio=mlp_ratio,
@@ -173,150 +180,20 @@ class SDiT_Base(nn.Module):
                     p=p,
                     attn_p=attn_p,
                 )
-        self.block2 = Encoder(
-                    dim=embed_dim,
-                    n_heads=n_heads,
-                    mlp_ratio=mlp_ratio,
-                    qkv_bias=qkv_bias,
-                    p=p,
-                    attn_p=attn_p,
-                )
-        self.block3 = Encoder(
-                    dim=embed_dim,
-                    n_heads=n_heads,
-                    mlp_ratio=mlp_ratio,
-                    qkv_bias=qkv_bias,
-                    p=p,
-                    attn_p=attn_p,
-                )
-        self.block4 = Encoder(
-                    dim=embed_dim,
-                    n_heads=n_heads,
-                    mlp_ratio=mlp_ratio,
-                    qkv_bias=qkv_bias,
-                    p=p,
-                    attn_p=attn_p,
-                )
-        self.block5 = Encoder(
-                    dim=embed_dim,
-                    n_heads=n_heads,
-                    mlp_ratio=mlp_ratio,
-                    qkv_bias=qkv_bias,
-                    p=p,
-                    attn_p=attn_p,
-                )
-        self.block6 = Encoder(
-                    dim=embed_dim,
-                    n_heads=n_heads,
-                    mlp_ratio=mlp_ratio,
-                    qkv_bias=qkv_bias,
-                    p=p,
-                    attn_p=attn_p,
-                )
-        self.block7 = Encoder(
-                    dim=embed_dim,
-                    n_heads=n_heads,
-                    mlp_ratio=mlp_ratio,
-                    qkv_bias=qkv_bias,
-                    p=p,
-                    attn_p=attn_p,
-                )
-        self.block8 = Encoder(
-                    dim=embed_dim,
-                    n_heads=n_heads,
-                    mlp_ratio=mlp_ratio,
-                    qkv_bias=qkv_bias,
-                    p=p,
-                    attn_p=attn_p,
-                )
-        self.block9 = Encoder(
-                    dim=embed_dim,
-                    n_heads=n_heads,
-                    mlp_ratio=mlp_ratio,
-                    qkv_bias=qkv_bias,
-                    p=p,
-                    attn_p=attn_p,
-                )
-        self.block10 = Encoder(
-                    dim=embed_dim,
-                    n_heads=n_heads,
-                    mlp_ratio=mlp_ratio,
-                    qkv_bias=qkv_bias,
-                    p=p,
-                    attn_p=attn_p,
-                )
-        self.block11 = Encoder(
-                    dim=embed_dim,
-                    n_heads=n_heads,
-                    mlp_ratio=mlp_ratio,
-                    qkv_bias=qkv_bias,
-                    p=p,
-                    attn_p=attn_p,
-                )
-        self.block12 = Encoder(
-                    dim=embed_dim,
-                    n_heads=n_heads,
-                    mlp_ratio=mlp_ratio,
-                    qkv_bias=qkv_bias,
-                    p=p,
-                    attn_p=attn_p,
-                )
-        
-        self.aux_mlp1 = Aux_MLP(
-            in_features=embed_dim,
-            hidden_features= 64,
-            out_features=32,
-            n_classes=self.n_classes,
+                for _ in range(depth)
+            ]
         )
-        self.aux_mlp2 = Aux_MLP(
-            in_features=embed_dim,
-            hidden_features= 64,
-            out_features=32,n_classes=self.n_classes,
-        )
-        self.aux_mlp3 = Aux_MLP(
-            in_features=embed_dim,
-            hidden_features= 64,
-            out_features=32,n_classes=self.n_classes,
-        )
-        self.aux_mlp4 = Aux_MLP(
-            in_features=embed_dim,
-            hidden_features= 64,
-            out_features=32,n_classes=self.n_classes,
-        )
-        self.aux_mlp5 = Aux_MLP(
-            in_features=embed_dim,
-            hidden_features= 64,
-            out_features=32,n_classes=self.n_classes,
-        )
-        self.aux_mlp6 = Aux_MLP(
-            in_features=embed_dim,
-            hidden_features= 64,
-            out_features=32,n_classes=self.n_classes,
-        )
-        self.aux_mlp7 = Aux_MLP(
-            in_features=embed_dim,
-            hidden_features= 64,
-            out_features=32,n_classes=self.n_classes,
-        )
-        self.aux_mlp8 = Aux_MLP(
-            in_features=embed_dim,
-            hidden_features= 64,
-            out_features=32,n_classes=self.n_classes,
-        )
-        self.aux_mlp9 = Aux_MLP(
-            in_features=embed_dim,
-            hidden_features= 64,
-            out_features=32,n_classes=self.n_classes,
-        )
-        self.aux_mlp10 = Aux_MLP(
-            in_features=embed_dim,
-            hidden_features= 64,
-            out_features=32,n_classes=self.n_classes,
-        )
-        self.aux_mlp11 = Aux_MLP(
-            in_features=embed_dim,
-            hidden_features= 64,
-            out_features=32,n_classes=self.n_classes,
+
+        self.aux_mlps = nn.ModuleList(
+            [
+                Aux_MLP(
+                    in_features=embed_dim,
+                    hidden_features= 64,
+                    out_features=32,
+                    n_classes=self.n_classes,
+                )
+                for _ in range(depth - 1)  # 마지막 블록은 메인 head를 사용하므로 depth - 1개
+            ]
         )
 
         self.norm = nn.LayerNorm(embed_dim, eps=1e-6)
@@ -330,46 +207,17 @@ class SDiT_Base(nn.Module):
         x = x + self.pos_embed  # (n_samples, 1+n_patches, embed_dim)
         x = self.pos_drop(x)
 
-        # for block in self.blocks:
-        #     x = block(x)  # (n_samples, 577, 768)
-        
-        x = self.block1(x)
-        middle_output1 = self.aux_mlp1(x)
-        
-        x = self.block2(x)
-        middle_output2 = self.aux_mlp2(x)
-        
-        x = self.block3(x)
-        middle_output3 = self.aux_mlp3(x)
-        
-        x = self.block4(x)
-        middle_output4 = self.aux_mlp4(x)
-        
-        x = self.block5(x)
-        middle_output5 = self.aux_mlp5(x)
-        
-        x = self.block6(x)
-        middle_output6 = self.aux_mlp6(x)
-        
-        x = self.block7(x)
-        middle_output7 = self.aux_mlp7(x)
-        
-        x = self.block8(x)
-        middle_output8 = self.aux_mlp8(x)
-        
-        x = self.block9(x)
-        middle_output9 = self.aux_mlp9(x)
-        
-        x = self.block10(x)
-        middle_output10 = self.aux_mlp10(x)
-        
-        x = self.block11(x)
-        middle_output11 = self.aux_mlp11(x)
-        
-        x = self.block12(x)
+        # [수정] 개별 block/aux_mlp 호출을 반복문으로 변경 (블록 수가 depth에 따라 결정됨)
+        # 마지막 블록을 제외한 각 블록 출력에 보조 분류기를 적용해 중간 출력을 모음
+        middle_outputs = []
+        for i, block in enumerate(self.blocks):
+            x = block(x)  # (n_samples, 577, 768)
+            if i < len(self.aux_mlps):
+                middle_outputs.append(self.aux_mlps[i](x))
 
         x = self.norm(x)
         cls_token_final = x[:, 0]  # just tje CLS token
         x = self.head(cls_token_final)
 
-        return x, middle_output1, middle_output2, middle_output3, middle_output4, middle_output5, middle_output6, middle_output7, middle_output8, middle_output9, middle_output10, middle_output11
+        # [수정] 반환값: (최종 출력, 중간 출력 depth-1개). depth=12이면 기존과 동일하게 12개 반환
+        return x, *middle_outputs
